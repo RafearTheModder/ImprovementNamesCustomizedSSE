@@ -1,14 +1,16 @@
 {
-  "name": "improvementnamescustomizedae",
-  "version-string": "1.4.0",
-  "description": "",
-  "homepage": "",
+  "name": "commonlibvr-templateplugin",
+  "version-string": "0.0.1",
+  "description": "A simple template plugin to use as a starting point for making CommonLibVR based SKSE plugins",
+  "homepage": "N/A",
   "license": "MIT",
   "dependencies": [
+    "boost-atomic",
     "boost-stl-interfaces",
     "rsm-binary-io",
-    "spdlog",
     "xbyak",
-    "nlohmann-json"
+    "clib-util",
+    "nlohmann-json",
+    "spdlog"
   ]
 }

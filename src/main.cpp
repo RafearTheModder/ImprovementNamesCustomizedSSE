@@ -3,18 +3,18 @@
 #include "version.h"
 
 #include "SKSE/API.h"
-
-void InitLogger()
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 #ifndef NDEBUG
 	auto sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
 #else
 	auto path = logger::log_directory();
 	if (!path) {
-		return;
+		return false;
 	}
 
-	*path /= fmt::format("{}.log"sv, Version::PROJECT);
+	*path /= Version::PROJECT;
+	*path += ".log"sv;
 	auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
 #endif
 
@@ -28,25 +28,37 @@ void InitLogger()
 #endif
 
 	spdlog::set_default_logger(std::move(log));
-	spdlog::set_pattern("%s(%#): [%^%l%$] %v"s);
+	spdlog::set_pattern("%g(%#): [%^%l%$] %v"s);
 
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
+
+	a_info->infoVersion = SKSE::PluginInfo::kVersion;
+	a_info->name = Version::PROJECT.data();
+	a_info->version = Version::MAJOR;
+
+	if (a_skse->IsEditor()) {
+		logger::critical("Loaded in editor, marking as incompatible");
+		return false;
+	}
+
+	const auto ver = a_skse->RuntimeVersion();
+	if (ver <
+#ifndef SKYRIMVR
+		SKSE::RUNTIME_1_5_39
+#else
+		SKSE::RUNTIME_VR_1_4_15
+#endif
+	) {
+		logger::critical(FMT_STRING("Unsupported runtime version {}"), ver.string());
+		return false;
+	}
+
+	return true;
 }
 
-extern "C" DLLEXPORT constexpr auto SKSEPlugin_Version =
-[]() {
-	SKSE::PluginVersionData v{};
-	v.PluginVersion(Version::MAJOR);
-	v.PluginName(Version::PROJECT);
-	v.AuthorName("fudgyduff and colinswrath"sv);
-	v.UsesAddressLibrary(true);
-	return v;
-}();
-
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface * a_skse)
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	InitLogger();
-	logger::info("ImprovementNamesCustomizedSSE loaded");
+	logger::info("loaded");
 
 	SKSE::Init(a_skse);
 
@@ -65,4 +77,4 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface * a_
 	//logger::info(std::string(res));
 
 	return true;
-};
+}
