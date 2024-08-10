@@ -8,7 +8,6 @@
     "boost-atomic",
     "boost-stl-interfaces",
     "rsm-binary-io",
-    "xbyak",
     "clib-util",
     "nlohmann-json",
     "spdlog"

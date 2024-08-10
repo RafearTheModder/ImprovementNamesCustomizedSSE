@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-set(NAME "ImprovementNamesCustomizedVR")
+set(NAME "ImprovementNamesCustomizedSSE")
 set(VERSION 1.4.0)
 
 # ---- Options ----
@@ -96,7 +96,6 @@ endif()
 
 if (MSVC)
 	add_compile_definitions(
-		SKSE_SUPPORT_XBYAK
 		_UNICODE
 	)
 
